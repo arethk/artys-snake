@@ -7,38 +7,42 @@ body {
 }
 
 .container {
-    /* display: flex;
-    flex-direction: column; */
     display: grid;
     height: 100vh;
     width: 100vw;
-    /* grid-template-rows: repeat(5, 1fr); */
-    /* grid-template-columns: repeat(3, 1fr); */
 }
-/* 
+
 .header {
-    font-size: 5.0vh;
+    display: flex;
+    font-size: 6.0vh;
     font-weight: bold;
-    margin: auto;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+}
+
+.header::after {
+    content: "Artys Snake";
 }
 
 .footer {
     display: flex;
     flex-direction: column;
-    margin: auto;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
 }
 
-.game {
-    display: grid;
-    height: 75vh;
-    width: 100vw;
-    grid-template-rows: repeat(3, 1fr);
-    grid-template-columns: repeat(3, 1fr);
+button {
+    cursor: pointer;
+    width: 100px;
+    height: 30px;
+    margin: 10px;
+    font-weight: bold;
 }
 
-.cell {
-    min-width: 0;
-    min-height: 0;
+.flip {
+    transform: rotate(180deg);
 }
 
 .left-right-container {
@@ -46,17 +50,3 @@ body {
     flex-direction: row;
     margin: auto;
 }
-
-.flex {
-    flex: 1;
-}
-
-button {
-    cursor: pointer;
-    width: 100px;
-    margin: 10px;
-}
-
-.up-down-button {
-    margin: auto;
-} */
