@@ -10,9 +10,12 @@ class ArtysSnakeGame {
         this.container = container;
         this.rows = rows;
         this.columns = columns;
+
+        // action
+        this.buildHTML();
     }
 
-    createGameHTML() {
+    buildHTML() {
         if (!this.container || this.container instanceof HTMLElement === false) {
             throw new Error("Invalid container");
         }
@@ -92,9 +95,11 @@ class ArtysSnakeGame {
     }
 }
 
-const app = new ArtysSnakeGame(document.querySelector(".container"), 12, 12);
+let app = null;
 window.onload = function () {
-    app.createGameHTML();
+    const gameRows = 12;
+    const gameColumns = 12;
+    app = new ArtysSnakeGame(document.querySelector(".container"), gameRows, gameColumns);
     // TODO: handle popup?
 }
 
