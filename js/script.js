@@ -1,5 +1,5 @@
-const GAME_ROWS = 10;
-const GAME_COLUMNS = 10;
+const GAME_ROWS = 12;
+const GAME_COLUMNS = 12;
 window.onload = function () {
     const container = document.querySelector(".container");
     // set css grid rows and columns
@@ -24,7 +24,7 @@ window.onload = function () {
     for (let i = 0; i < GAME_ROWS; i++) {
         const gameGridNameList = [];
         for (let j = 0; j < GAME_COLUMNS; j++) {
-            const cellGridName = "cell" + i + "" + j;
+            const cellGridName = "cellR" + i + "C" + j;
             gameGridNameList.push(cellGridName);
             const div = document.createElement("div");
             div.style.gridArea = cellGridName;
