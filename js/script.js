@@ -6,7 +6,7 @@ class ArtysSnakeGame {
         }
         ArtysSnakeGame.instance = this;
 
-        // logic
+        // construct
         this.container = container;
         this.rows = rows;
         this.columns = columns;

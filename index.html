@@ -10,7 +10,20 @@
 </head>
 
 <body>
-    <div class="popup hide">Welcome to Arys Snake!</div>
+    <div id="welcome" class="popup">
+        <div class="welcome-popup-item">Welcome to Arys Snake!</div>
+        <div></div>
+        <div class="welcome-popup-item">
+            <button class="play-button" type="button">Go</button>
+        </div>
+    </div>
+    <div id="gameover" class="popup hide">
+        <div class="gameover-popup-item">Game Over!</div>
+        <div class="gameover-popup-item">Score: <span id="score">0</span></div>
+        <div class="gameover-popup-item">
+            <button class="tryagain-button" type="button">Try Again</button>
+        </div>
+    </div>
     <div class="container"></div>
     <script src="js/script.js"></script>
 </body>
