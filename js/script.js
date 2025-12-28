@@ -10,7 +10,6 @@ class ArtysSnakeGame {
         this.container = container;
         this.rows = rows;
         this.columns = columns;
-        this.createGameHTML(rows, columns);
     }
 
     createGameHTML() {
@@ -87,9 +86,18 @@ class ArtysSnakeGame {
         }
         this.container.style.gridTemplateAreas += '"' + footerGridNameList.join(" ") + '"';
     }
+
+    destroy() {
+        // TODO: destroy stuff
+    }
 }
 
 const app = new ArtysSnakeGame(document.querySelector(".container"), 12, 12);
 window.onload = function () {
+    app.createGameHTML();
     // TODO: handle popup?
+}
+
+window.onbeforeunload = function () {
+    app.destroy();
 }
