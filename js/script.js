@@ -23,7 +23,7 @@ window.onload = function () {
     // create game area
     for (let i = 0; i < GAME_ROWS; i++) {
         const gameGridNameList = [];
-        for (let j = 0; j < GAME_ROWS; j++) {
+        for (let j = 0; j < GAME_COLUMNS; j++) {
             const cellGridName = "cell" + i + "" + j;
             gameGridNameList.push(cellGridName);
             const div = document.createElement("div");
