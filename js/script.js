@@ -13,9 +13,16 @@ class ArtysSnakeGame {
 
         // constants
         this.Constants = {};
-        // TODO: add constants for buildHTML function
+        this.Constants.minimum = {};
+        this.Constants.minimum.rows = 5;
+        this.Constants.minimum.columns = 5;
+        this.Constants.layout = {};
+        this.Constants.layout.header = "header";
+        this.Constants.layout.footer = "footer";
+        this.Constants.layout.leftrightcontainer = "left-right-container";
+        this.Constants.layout.flip = "flip";
         this.Constants.gridValues = {};
-        this.Constants.gridValues.border = null;
+        this.Constants.gridValues.border = "B";
         this.Constants.gridValues.empty = 0;
         this.Constants.gridValues.head = 1;
         this.Constants.gridValues.egg = "E";
@@ -31,6 +38,11 @@ class ArtysSnakeGame {
         this.Constants.directions.down = "down";
         this.Constants.directions.left = "left";
         this.Constants.directions.right = "right";
+        this.Constants.buttons = {};
+        this.Constants.buttons.up = "^";
+        this.Constants.buttons.down = "^";
+        this.Constants.buttons.left = "<";
+        this.Constants.buttons.right = ">";
 
         // action
         this.buildHTML();
@@ -40,40 +52,51 @@ class ArtysSnakeGame {
     reset() {
         this.score = 0;
         this.direction = this.Constants.directions.up;
-        this.grid = this.buildDefaultGrid();
+        this.grid = this.buildStartingGrid();
         this.drawGrid();
         // TODO: handle popup?
 
     }
 
     drawGrid() {
+        const gridCssClasses = [
+            this.Constants.gridCssClass.border,
+            //this.Constants.gridCssClass.empty,
+            this.Constants.gridCssClass.head,
+            this.Constants.gridCssClass.egg,
+            // TODO: add body?
+            // TODO: add colision?
+        ];
         for (let i = 0; i < this.grid.length; i++) {
             const row = this.grid[i];
             for (let j = 0; j < row.length; j++) {
                 const item = row[j];
-                const cell = document.querySelector("." + ArtysSnakeGame.generateCellName(i, j));
+                const cell = document.querySelector(`.${ArtysSnakeGame.generateCellName(i, j)}`);
+                gridCssClasses.forEach(c => {
+                    cell.classList.remove(c);
+                });
                 switch (item) {
                     case this.Constants.gridValues.border:
-                        cell.classList = this.Constants.gridCssClass.border;
+                        cell.classList.add(this.Constants.gridCssClass.border);
                         break;
                     case this.Constants.gridValues.empty:
-                        cell.classList = this.Constants.gridCssClass.empty;
+                        //cell.classList.add(this.Constants.gridCssClass.empty);
                         break;
                     case this.Constants.gridValues.head:
-                        cell.classList = this.Constants.gridCssClass.head;
+                        cell.classList.add(this.Constants.gridCssClass.head);
                         break;
                     case this.Constants.gridValues.egg:
-                        cell.classList = this.Constants.gridCssClass.egg;
+                        cell.classList.add(this.Constants.gridCssClass.egg);
                         break;
                     default:
-                        console.log("Invalid grid value");
+                        console.log(`Invalid grid value ${item}`);
                         break;
                 }
             }
         }
     }
 
-    buildDefaultGrid() {
+    buildStartingGrid() {
         const headLocationRow = this.rows - 3;
         const headLocationColumn = Math.floor(this.columns / 2);
         const grid = [];
@@ -96,33 +119,32 @@ class ArtysSnakeGame {
     }
 
     static generateCellName(row, column) {
-        return "cellR" + row + "C" + column;
+        return `cellR${row}C${column}`;
     }
 
     buildHTML() {
         if (!this.container || this.container instanceof HTMLElement === false) {
             throw new Error("Invalid container");
         }
-        if (Number.isInteger(this.rows) === false || Number.isInteger(this.columns) === false || this.rows < 5 || this.columns < 5) {
-            throw new Error("Rows must be a minimum of 5 and columns must be a minimum of 5");
+        if (Number.isInteger(this.rows) === false || Number.isInteger(this.columns) === false || this.rows < this.Constants.minimum.rows || this.columns < this.Constants.minimum.columns) {
+            throw new Error(`Rows must be a minimum of ${this.Constants.minimum.rows} and columns must be a minimum of ${this.Constants.minimum.columns}`);
         }
         // set css grid rows and columns
-        this.container.style.gridTemplateRows = "minmax(50px, 2fr) repeat(" + this.rows + ", minmax(10px, 1fr)) minmax(150px, 4fr)";
-        this.container.style.gridTemplateColumns = "repeat(" + this.columns + ", minmax(30px, 1fr))";
+        this.container.style.gridTemplateRows = `minmax(50px, 2fr) repeat(${this.rows}, minmax(10px, 1fr)) minmax(150px, 4fr)`;
+        this.container.style.gridTemplateColumns = `repeat(${this.columns}, minmax(30px, 1fr))`;
 
         // create header area
-        const headerGridName = "header";
         const headerDiv = document.createElement("div");
-        headerDiv.classList.add("header");
-        headerDiv.style.gridArea = headerGridName;
+        headerDiv.classList.add(this.Constants.layout.header);
+        headerDiv.style.gridArea = this.Constants.layout.header;
         this.container.appendChild(headerDiv);
 
         // create header grid area
         const headerGridNameList = [];
         for (let i = 0; i < this.columns; i++) {
-            headerGridNameList.push(headerGridName);
+            headerGridNameList.push(this.Constants.layout.header);
         }
-        this.container.style.gridTemplateAreas = '"' + headerGridNameList.join(" ") + '"';
+        this.container.style.gridTemplateAreas = `"${headerGridNameList.join(" ")}"`;
 
         // create game area
         for (let i = 0; i < this.rows; i++) {
@@ -135,35 +157,34 @@ class ArtysSnakeGame {
                 div.style.gridArea = cellGridName;
                 this.container.appendChild(div);
             }
-            this.container.style.gridTemplateAreas += '"' + gameGridNameList.join(" ") + '"';
+            this.container.style.gridTemplateAreas += `"${gameGridNameList.join(" ")}"`;
         }
 
         // create footer area
-        const footerGridName = "footer";
         const footerDiv = document.createElement("div");
-        footerDiv.classList.add("footer");
-        footerDiv.style.gridArea = footerGridName;
+        footerDiv.classList.add(this.Constants.layout.footer);
+        footerDiv.style.gridArea = this.Constants.layout.footer;
 
         // create control buttons
         const upButton = document.createElement("button");
-        upButton.id = "up";
-        upButton.innerText = "^";
+        upButton.id = this.Constants.directions.up;
+        upButton.innerText = this.Constants.buttons.up;
         upButton.onclick = () => { app.direction = app.Constants.directions.up; };
         const leftButton = document.createElement("button");
-        leftButton.id = "left";
-        leftButton.innerText = "<";
+        leftButton.id = this.Constants.directions.left;
+        leftButton.innerText = this.Constants.buttons.left;
         leftButton.onclick = () => { app.direction = app.Constants.directions.left; };
         const rightButton = document.createElement("button");
-        rightButton.id = "right";
-        rightButton.innerText = ">";
+        rightButton.id = this.Constants.directions.right;
+        rightButton.innerText = this.Constants.buttons.right;
         rightButton.onclick = () => { app.direction = app.Constants.directions.right; };
         const downButton = document.createElement("button");
-        downButton.id = "down";
-        downButton.classList.add("flip");
-        downButton.innerText = "^";
+        downButton.id = this.Constants.directions.down;
+        downButton.classList.add(this.Constants.layout.flip);
+        downButton.innerText = this.Constants.buttons.down;
         downButton.onclick = () => { app.direction = app.Constants.directions.down; };
         const leftRightDiv = document.createElement("div");
-        leftRightDiv.classList.add("left-right-container");
+        leftRightDiv.classList.add(this.Constants.layout.leftrightcontainer);
         leftRightDiv.appendChild(leftButton);
         leftRightDiv.appendChild(rightButton);
         footerDiv.appendChild(upButton);
@@ -174,9 +195,9 @@ class ArtysSnakeGame {
         // create header grid area
         const footerGridNameList = [];
         for (let i = 0; i < this.columns; i++) {
-            footerGridNameList.push(footerGridName);
+            footerGridNameList.push(this.Constants.layout.footer);
         }
-        this.container.style.gridTemplateAreas += '"' + footerGridNameList.join(" ") + '"';
+        this.container.style.gridTemplateAreas += `"${footerGridNameList.join(" ")}"`;
     }
 
     destroy() {
@@ -187,9 +208,10 @@ class ArtysSnakeGame {
 
 let app = null;
 window.onload = function () {
+    const container = "container";
     const gameRows = 12;
     const gameColumns = 12;
-    app = new ArtysSnakeGame(document.querySelector(".container"), gameRows, gameColumns);
+    app = new ArtysSnakeGame(document.querySelector(`.${container}`), gameRows, gameColumns);
     // TODO: handle popup?
 }
 
