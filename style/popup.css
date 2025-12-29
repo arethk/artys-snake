@@ -1,0 +1,59 @@
+.popup {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    width: 80%;
+    height: 80%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: green;
+    border-radius: 12px;
+    border: none;
+    opacity: 0.9;
+    justify-content: center;
+    min-width: 100px;
+    min-height: 100px;
+}
+
+.welcome-popup-container {
+    display: grid;
+    height: 100vh;
+    grid-template-rows: repeat(2, minmax(1fr, 1fr));
+    grid-template-columns: repeat(1, minmax(1fr, 1fr));
+}
+
+.gameover-popup-container {
+    display: grid;
+    height: 100vh;
+    grid-template-rows: repeat(3, minmax(1fr, 1fr));
+    grid-template-columns: repeat(1, minmax(1fr, 1fr));
+}
+
+.popup-item {
+    text-align: center;
+    color: white;
+    font-weight: bold;
+    font-size: 5.0vw;
+}
+
+.align-content-center {
+    align-content: center;
+}
+
+.align-content-end {
+    align-content: end;
+}
+
+.popup-button {
+    height: 20vh;
+    width: 40vw;
+    cursor: pointer;
+    font-size: 5.0vw;
+    font-weight: bold;
+}
+
+.hide {
+    display: none;
+    visibility: hidden;
+}
