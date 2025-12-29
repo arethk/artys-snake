@@ -21,3 +21,11 @@
     font-weight: bold;
     color: brown;
 }
+
+.collision {
+    background-color: red;
+}
+
+.body {
+    background-color: darkgreen;
+}

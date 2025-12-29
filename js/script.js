@@ -13,6 +13,8 @@ class ArtysSnakeGame {
 
         // constants
         this.Constants = {};
+        this.Constants.default = {};
+        this.Constants.default.timeout = 1111;
         this.Constants.minimum = {};
         this.Constants.minimum.rows = 5;
         this.Constants.minimum.columns = 5;
@@ -26,13 +28,14 @@ class ArtysSnakeGame {
         this.Constants.gridValues.empty = 0;
         this.Constants.gridValues.head = 1;
         this.Constants.gridValues.egg = "E";
-        // TODO: add one for border or snake colision?
+        this.Constants.gridValues.collision = "X";
         this.Constants.gridCssClass = {};
         this.Constants.gridCssClass.border = "border";
         this.Constants.gridCssClass.empty = "";
         this.Constants.gridCssClass.head = "head";
+        this.Constants.gridCssClass.body = "body";
         this.Constants.gridCssClass.egg = "egg";
-        // TODO: add one for border or snake colision?
+        this.Constants.gridCssClass.collision = "collision";
         this.Constants.directions = {};
         this.Constants.directions.up = "up";
         this.Constants.directions.down = "down";
@@ -45,17 +48,119 @@ class ArtysSnakeGame {
         this.Constants.buttons.right = ">";
 
         // action
+        this.interval = null;
         this.buildHTML();
         this.reset();
     }
 
     reset() {
+        // TODO: destroy instead?
+        if (this.interval) {
+            clearInterval(this.interval);
+        }
         this.score = 0;
         this.direction = this.Constants.directions.up;
         this.grid = this.buildStartingGrid();
         this.drawGrid();
         // TODO: handle popup?
+        this.startGame();
+    }
 
+    startGame() {
+        this.interval = setInterval(() => {
+            this.printGrid();
+            // find head
+            const headLocation = this.findGridItemByValue(this.Constants.gridValues.head);
+            console.log(headLocation);
+            const newHeadLocation = this.calculateNewPosition(headLocation.row, headLocation.column);
+            console.log(newHeadLocation);
+            const eggLocation = this.findGridItemByValue(this.Constants.gridValues.egg);
+            console.log(eggLocation);
+
+            // handle out of bounds
+            if (newHeadLocation.row === this.rows - 1 || newHeadLocation.row === 0 || newHeadLocation.column === 0 || newHeadLocation.column === this.columns - 1) {
+                clearInterval(this.interval);
+                this.grid[headLocation.row][headLocation.column]--;
+                this.grid[newHeadLocation.row][newHeadLocation.column] = this.Constants.gridValues.collision;
+                // TODO: show game over popup?
+            } else if (false) { // TODO: handle detect touch self
+
+            } else if (eggLocation && newHeadLocation.row === eggLocation.row && newHeadLocation.column === eggLocation.column) {
+                // handle got egg
+                this.score++;
+                this.grid[headLocation.row][headLocation.column]++;
+                this.grid[newHeadLocation.row][newHeadLocation.column] = this.Constants.gridValues.head;
+            } else {
+                // handle movement
+                if (this.score === 0) {
+                    this.grid[headLocation.row][headLocation.column]--;
+                    this.grid[newHeadLocation.row][newHeadLocation.column]++;
+                } else {
+                    //this.grid[headLocation.row][headLocation.column]++;
+                    this.grid[newHeadLocation.row][newHeadLocation.column] = this.Constants.gridValues.head;
+                    for (let i = 1; i <= this.score; i++) {
+                        const bodyLocation = this.findGridItemByValue(i);
+                        if (i === this.score) {
+                            // handle tail removal
+                            this.grid[bodyLocation.row][bodyLocation.column] = this.Constants.gridValues.empty;
+                        } else {
+                            // handle body movement
+                            this.grid[headLocation.row][headLocation.column]++;
+                            this.grid[bodyLocation.row][bodyLocation.column]++;
+                        }
+                    }
+                }
+            }
+            this.printGrid();
+            this.drawGrid();
+        }, this.Constants.default.timeout)
+    }
+
+    calculateNewPosition(row, column) {
+        switch (this.direction) {
+            case this.Constants.directions.up:
+                return {
+                    row: row - 1,
+                    column: column
+                };
+                break;
+            case this.Constants.directions.down:
+                return {
+                    row: row + 1,
+                    column: column
+                };
+                break;
+            case this.Constants.directions.left:
+                return {
+                    row: row,
+                    column: column - 1
+                };
+                break;
+            case this.Constants.directions.right:
+                return {
+                    row: row,
+                    column: column + 1
+                };
+                break;
+            default:
+                console.log(`Invalid direction ${this.direction}`);
+                break;
+        }
+    }
+
+    findGridItemByValue(value) {
+        for (let i = 0; i < this.grid.length; i++) {
+            const row = this.grid[i];
+            for (let j = 0; j < row.length; j++) {
+                const item = row[j];
+                if (item === value) {
+                    return {
+                        row: i,
+                        column: j
+                    };
+                }
+            }
+        }
     }
 
     drawGrid() {
@@ -63,9 +168,9 @@ class ArtysSnakeGame {
             this.Constants.gridCssClass.border,
             //this.Constants.gridCssClass.empty,
             this.Constants.gridCssClass.head,
+            this.Constants.gridCssClass.body,
             this.Constants.gridCssClass.egg,
-            // TODO: add body?
-            // TODO: add colision?
+            //this.Constants.gridCssClass.collision,
         ];
         for (let i = 0; i < this.grid.length; i++) {
             const row = this.grid[i];
@@ -88,8 +193,15 @@ class ArtysSnakeGame {
                     case this.Constants.gridValues.egg:
                         cell.classList.add(this.Constants.gridCssClass.egg);
                         break;
+                    case this.Constants.gridValues.collision:
+                        cell.classList.add(this.Constants.gridCssClass.collision);
+                        break;
                     default:
-                        console.log(`Invalid grid value ${item}`);
+                        if (Number.isInteger(item)) {
+                            cell.classList.add(this.Constants.gridCssClass.body);
+                        } else {
+                            console.log(`Invalid grid value ${item}`);
+                        }
                         break;
                 }
             }
@@ -116,10 +228,6 @@ class ArtysSnakeGame {
         // TODO: make this random???
         grid[3][3] = this.Constants.gridValues.egg;
         return grid;
-    }
-
-    static generateCellName(row, column) {
-        return `cellR${row}C${column}`;
     }
 
     buildHTML() {
@@ -200,9 +308,24 @@ class ArtysSnakeGame {
         this.container.style.gridTemplateAreas += `"${footerGridNameList.join(" ")}"`;
     }
 
+    printGrid() {
+        let output = "";
+        for (let i = 0; i < this.grid.length; i++) {
+            const row = this.grid[i];
+            output += `${row.join("  ")}\n`;
+        }
+        console.log(output.trim());
+    }
+
+    static generateCellName(row, column) {
+        return `cellR${row}C${column}`;
+    }
+
     destroy() {
         // TODO: destroy stuff
-        // TODO: clear timer
+        if (this.interval) {
+            clearInterval(this.interval);
+        }
     }
 }
 
