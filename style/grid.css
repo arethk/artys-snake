@@ -1,0 +1,23 @@
+.border {
+    background-color: black;
+}
+
+.head {
+    margin: auto;
+}
+
+.head::after {
+    content: "H";
+    font-weight: bold;
+    color: green;
+}
+
+.egg {
+    margin: auto;
+}
+
+.egg::after {
+    content: "O";
+    font-weight: bold;
+    color: brown;
+}

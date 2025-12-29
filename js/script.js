@@ -11,8 +11,82 @@ class ArtysSnakeGame {
         this.rows = rows;
         this.columns = columns;
 
+        // constants
+        this.Constants = {};
+        this.Constants.gridValues = {};
+        this.Constants.gridValues.border = null;
+        this.Constants.gridValues.empty = 0;
+        this.Constants.gridValues.head = 1;
+        this.Constants.gridValues.egg = "E";
+        this.Constants.directions = {};
+        this.Constants.directions.up = "up";
+        this.Constants.directions.down = "down";
+        this.Constants.directions.left = "left";
+        this.Constants.directions.right = "right";
+
         // action
         this.buildHTML();
+        this.reset();
+    }
+
+    reset() {
+        this.score = 0;
+        this.direction = this.Constants.directions.up;
+        this.grid = this.buildDefaultGrid();
+        this.drawGrid();
+    }
+
+    drawGrid() {
+        for (let i = 0; i < this.grid.length; i++) {
+            const row = this.grid[i];
+            for (let j = 0; j < row.length; j++) {
+                const item = row[j];
+                const cell = document.querySelector("." + ArtysSnakeGame.generateCellName(i, j));
+                switch (item) {
+                    case this.Constants.gridValues.border:
+                        cell.classList = "border";
+                        break;
+                    case this.Constants.gridValues.empty:
+                        cell.classList = "";
+                        break;
+                    case this.Constants.gridValues.head:
+                        cell.classList = "head";
+                        break;
+                    case this.Constants.gridValues.egg:
+                        cell.classList = "egg";
+                        break;
+                    default:
+                        console.log("Invalid grid value");
+                        break;
+                }
+            }
+        }
+    }
+
+    buildDefaultGrid() {
+        const headLocationRow = this.rows - 3;
+        const headLocationColumn = Math.floor(this.columns / 2);
+        const grid = [];
+        for (let i = 0; i < this.rows; i++) {
+            const row = [];
+            for (let j = 0; j < this.columns; j++) {
+                if ([0, this.rows - 1].includes(i) || [0, this.columns - 1].includes(j)) {
+                    row.push(this.Constants.gridValues.border);
+                } else if (i === headLocationRow && j === headLocationColumn) {
+                    row.push(this.Constants.gridValues.head);
+                } else {
+                    row.push(this.Constants.gridValues.empty);
+                }
+            }
+            grid.push(row);
+        }
+        // TODO: make this random???
+        grid[3][3] = this.Constants.gridValues.egg;
+        return grid;
+    }
+
+    static generateCellName(row, column) {
+        return "cellR" + row + "C" + column;
     }
 
     buildHTML() {
@@ -44,9 +118,10 @@ class ArtysSnakeGame {
         for (let i = 0; i < this.rows; i++) {
             const gameGridNameList = [];
             for (let j = 0; j < this.columns; j++) {
-                const cellGridName = "cellR" + i + "C" + j;
+                const cellGridName = ArtysSnakeGame.generateCellName(i, j);
                 gameGridNameList.push(cellGridName);
                 const div = document.createElement("div");
+                div.classList.add(cellGridName);
                 div.style.gridArea = cellGridName;
                 this.container.appendChild(div);
             }
@@ -63,16 +138,20 @@ class ArtysSnakeGame {
         const upButton = document.createElement("button");
         upButton.id = "up";
         upButton.innerText = "^";
+        upButton.onclick = () => { app.direction = app.Constants.directions.up; };
         const leftButton = document.createElement("button");
         leftButton.id = "left";
         leftButton.innerText = "<";
+        leftButton.onclick = () => { app.direction = app.Constants.directions.left; };
         const rightButton = document.createElement("button");
         rightButton.id = "right";
         rightButton.innerText = ">";
+        rightButton.onclick = () => { app.direction = app.Constants.directions.right; };
         const downButton = document.createElement("button");
         downButton.id = "down";
         downButton.classList.add("flip");
         downButton.innerText = "^";
+        downButton.onclick = () => { app.direction = app.Constants.directions.down; };
         const leftRightDiv = document.createElement("div");
         leftRightDiv.classList.add("left-right-container");
         leftRightDiv.appendChild(leftButton);
@@ -104,5 +183,7 @@ window.onload = function () {
 }
 
 window.onbeforeunload = function () {
-    app.destroy();
+    if (app) {
+        app.destroy();
+    }
 }
