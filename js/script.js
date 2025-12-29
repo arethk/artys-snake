@@ -13,11 +13,19 @@ class ArtysSnakeGame {
 
         // constants
         this.Constants = {};
+        // TODO: add constants for buildHTML function
         this.Constants.gridValues = {};
         this.Constants.gridValues.border = null;
         this.Constants.gridValues.empty = 0;
         this.Constants.gridValues.head = 1;
         this.Constants.gridValues.egg = "E";
+        // TODO: add one for border or snake colision?
+        this.Constants.gridCssClass = {};
+        this.Constants.gridCssClass.border = "border";
+        this.Constants.gridCssClass.empty = "";
+        this.Constants.gridCssClass.head = "head";
+        this.Constants.gridCssClass.egg = "egg";
+        // TODO: add one for border or snake colision?
         this.Constants.directions = {};
         this.Constants.directions.up = "up";
         this.Constants.directions.down = "down";
@@ -34,6 +42,8 @@ class ArtysSnakeGame {
         this.direction = this.Constants.directions.up;
         this.grid = this.buildDefaultGrid();
         this.drawGrid();
+        // TODO: handle popup?
+
     }
 
     drawGrid() {
@@ -44,16 +54,16 @@ class ArtysSnakeGame {
                 const cell = document.querySelector("." + ArtysSnakeGame.generateCellName(i, j));
                 switch (item) {
                     case this.Constants.gridValues.border:
-                        cell.classList = "border";
+                        cell.classList = this.Constants.gridCssClass.border;
                         break;
                     case this.Constants.gridValues.empty:
-                        cell.classList = "";
+                        cell.classList = this.Constants.gridCssClass.empty;
                         break;
                     case this.Constants.gridValues.head:
-                        cell.classList = "head";
+                        cell.classList = this.Constants.gridCssClass.head;
                         break;
                     case this.Constants.gridValues.egg:
-                        cell.classList = "egg";
+                        cell.classList = this.Constants.gridCssClass.egg;
                         break;
                     default:
                         console.log("Invalid grid value");
@@ -171,6 +181,7 @@ class ArtysSnakeGame {
 
     destroy() {
         // TODO: destroy stuff
+        // TODO: clear timer
     }
 }
 
