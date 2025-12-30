@@ -16,16 +16,25 @@
         <div class="welcome-popup-container">
             <div class="popup-item align-content-center">Welcome to Arys Snake!</div>
             <div class="popup-item">
-                <button class="popup-button" type="button">Start</button>
+                <button class="popup-button" type="button" onclick="app.reset()">Start</button>
             </div>
         </div>
     </div>
     <div id="popupGameover" class="popup hide">
         <div class="gameover-popup-container">
             <div class="popup-item align-content-end">Game Over!</div>
-            <div class="popup-item align-content-center">Score: <span id="score">0</span></div>
+            <div class="popup-item align-content-center">Score: <span id="scoreLoss"></span></div>
             <div class="popup-item">
-                <button class="popup-button" type="button">Try Again</button>
+                <button class="popup-button" type="button" onclick="app.reset()">Try Again</button>
+            </div>
+        </div>
+    </div>
+    <div id="popupWin" class="popup hide">
+        <div class="gameover-popup-container">
+            <div class="popup-item align-content-end">You Win!</div>
+            <div class="popup-item align-content-center">Score: <span id="scoreWin"></span></div>
+            <div class="popup-item">
+                <button class="popup-button" type="button" onclick="app.reset()">Play Again</button>
             </div>
         </div>
     </div>

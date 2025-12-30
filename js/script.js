@@ -10,11 +10,17 @@ class ArtysSnakeGame {
         this.container = container;
         this.rows = rows;
         this.columns = columns;
+        this.popupWelcome = document.querySelector("#popupWelcome");
+        this.popupGameover = document.querySelector("#popupGameover");
+        this.popupWin = document.querySelector("#popupWin");
+        this.scoreLoss = document.querySelector("#scoreLoss");
+        this.scoreWin = document.querySelector("#scoreWin");
 
         // constants
         this.Constants = {};
         this.Constants.default = {};
         this.Constants.default.timeout = 500;
+        this.Constants.default.popupTimeout = 1000;
         this.Constants.minimum = {};
         this.Constants.minimum.rows = 5;
         this.Constants.minimum.columns = 5;
@@ -23,6 +29,7 @@ class ArtysSnakeGame {
         this.Constants.layout.footer = "footer";
         this.Constants.layout.leftrightcontainer = "left-right-container";
         this.Constants.layout.flip = "flip";
+        this.Constants.layout.hide = "hide";
         this.Constants.gridValues = {};
         this.Constants.gridValues.border = "B";
         this.Constants.gridValues.empty = 0;
@@ -50,19 +57,18 @@ class ArtysSnakeGame {
         // action
         this.interval = null;
         this.buildHTML();
-        this.reset();
+        this.showPopup(this.popupWelcome, 0);
     }
 
     reset() {
-        // TODO: destroy instead?
-        this.clearTimer()
+        this.clearTimer();
+        this.hideAllPopups();
         this.score = 0;
         this.direction = this.Constants.directions.up;
         this.nextDirection = this.direction; // to stop ui bug when changing direction in an invalid way caused by the timer delay
         this.buildStartingGrid();
         this.placeRandomEgg();
         this.drawGrid();
-        // TODO: handle popup?
         this.startGame();
     }
 
@@ -77,21 +83,11 @@ class ArtysSnakeGame {
             ) {
                 this.direction = this.nextDirection;
             }
-            //this.printGrid();
             // find head
             const headLocation = this.findGridItemByValue(this.Constants.gridValues.head);
-            //console.log(headLocation);
             const newHeadLocation = this.calculateNewPosition(headLocation.row, headLocation.column);
-            //console.log(newHeadLocation);
             const eggLocation = this.findGridItemByValue(this.Constants.gridValues.egg);
-            //console.log(eggLocation);
-            let bodyLocations = this.getBodyLocations();
-            console.log(bodyLocations);
-            for (let i = 0; i < bodyLocations.length; i++) {
-                const item = bodyLocations[i];
-                const isTail = i === bodyLocations.length - 1;
-                //console.log(`isTail: ${isTail}`);
-            }
+            const bodyLocations = this.getBodyLocations();
 
             if (eggLocation && newHeadLocation.row === eggLocation.row && newHeadLocation.column === eggLocation.column) {
                 // handle got egg
@@ -104,8 +100,9 @@ class ArtysSnakeGame {
                 if (this.isGameWinner() === true) {
                     // handle win
                     this.clearTimer();
-                    console.log("YOU WIN!");
-                    // TODO: add popup?
+                    setTimeout(() => {
+                        this.showPopup(this.popupWin, this.score);
+                    }, this.Constants.default.popupTimeout);
                 } else {
                     this.placeRandomEgg();
                 }
@@ -126,13 +123,14 @@ class ArtysSnakeGame {
                     // handle hitting border or self
                     this.clearTimer();
                     this.grid[newHeadLocation.row][newHeadLocation.column] = this.Constants.gridValues.collision;
-                    // TODO: add popup?
+                    setTimeout(() => {
+                        this.showPopup(this.popupGameover, this.score);
+                    }, this.Constants.default.popupTimeout);
                 } else {
                     // handle setting new head
                     this.grid[newHeadLocation.row][newHeadLocation.column] = this.Constants.gridValues.head;
                 }
             }
-            //this.printGrid();
             this.drawGrid();
         }, this.Constants.default.timeout)
     }
@@ -200,7 +198,7 @@ class ArtysSnakeGame {
             this.Constants.gridCssClass.head,
             this.Constants.gridCssClass.body,
             this.Constants.gridCssClass.egg,
-            //this.Constants.gridCssClass.collision,
+            this.Constants.gridCssClass.collision
         ];
         for (let i = 0; i < this.grid.length; i++) {
             const row = this.grid[i];
@@ -255,12 +253,6 @@ class ArtysSnakeGame {
             }
             this.grid.push(row);
         }
-        // this.grid[this.rows - 2][headLocationColumn] = 2;
-        // this.score++;
-        // this.grid[this.rows - 2][headLocationColumn - 1] = 3;
-        // this.score++;
-        // this.grid[this.rows - 2][headLocationColumn - 2] = 4;
-        // this.score++;
     }
 
     placeRandomEgg() {
@@ -306,13 +298,6 @@ class ArtysSnakeGame {
         const headerDiv = document.createElement("div");
         headerDiv.classList.add(this.Constants.layout.header);
         headerDiv.style.gridArea = this.Constants.layout.header;
-        headerDiv.onclick = () => { // TODO: remove this
-            if (this.interval) {
-                this.clearTimer();
-            } else {
-                this.startGame();
-            }
-        };
         this.container.appendChild(headerDiv);
 
         // create header grid area
@@ -383,6 +368,27 @@ class ArtysSnakeGame {
         }
     }
 
+    hideAllPopups() {
+        this.popupWelcome.classList.add(this.Constants.layout.hide);
+        this.popupGameover.classList.add(this.Constants.layout.hide);
+        this.popupWin.classList.add(this.Constants.layout.hide);
+    }
+
+    showPopup(popup, score) {
+        this.hideAllPopups();
+        switch (popup.id) {
+            case "popupGameover":
+                this.scoreLoss.innerText = score;
+                break;
+            case "popupWin":
+                this.scoreWin.innerText = score;
+                break;
+            default:
+                break;
+        }
+        popup.classList.remove(this.Constants.layout.hide);
+    }
+
     printGrid() {
         let output = "";
         for (let i = 0; i < this.grid.length; i++) {
@@ -397,7 +403,6 @@ class ArtysSnakeGame {
     }
 
     destroy() {
-        // TODO: destroy stuff
         this.clearTimer();
     }
 }
@@ -408,7 +413,6 @@ window.onload = function () {
     const gameRows = 12;
     const gameColumns = 12;
     app = new ArtysSnakeGame(document.querySelector(`.${container}`), gameRows, gameColumns);
-    // TODO: handle popup?
 }
 
 window.onbeforeunload = function () {
