@@ -80,8 +80,23 @@ class ArtysSnakeGame {
             // handle out of bounds
             if (newHeadLocation.row === this.rows - 1 || newHeadLocation.row === 0 || newHeadLocation.column === 0 || newHeadLocation.column === this.columns - 1) {
                 clearInterval(this.interval);
-                this.grid[headLocation.row][headLocation.column]--;
                 this.grid[newHeadLocation.row][newHeadLocation.column] = this.Constants.gridValues.collision;
+                if (this.score === 0) {
+                    this.grid[headLocation.row][headLocation.column]--;
+                } else {
+                    for (let i = 1; i <= this.score; i++) {
+                        const bodyPartValue = i + 1;
+                        const bodyLocation = this.findGridItemByValue(bodyPartValue);
+                        if (i === this.score) {
+                            this.grid[headLocation.row][headLocation.column]++;
+                            this.grid[bodyLocation.row][bodyLocation.column] = this.Constants.gridValues.empty;
+                        } else {
+                            // handle body movement
+                            this.grid[headLocation.row][headLocation.column]++;
+                            this.grid[bodyLocation.row][bodyLocation.column]++;
+                        }
+                    }
+                }
                 // TODO: show game over popup?
             } else if (false) { // TODO: handle detect touch self
 
@@ -96,12 +111,12 @@ class ArtysSnakeGame {
                     this.grid[headLocation.row][headLocation.column]--;
                     this.grid[newHeadLocation.row][newHeadLocation.column]++;
                 } else {
-                    //this.grid[headLocation.row][headLocation.column]++;
                     this.grid[newHeadLocation.row][newHeadLocation.column] = this.Constants.gridValues.head;
                     for (let i = 1; i <= this.score; i++) {
-                        const bodyLocation = this.findGridItemByValue(i);
+                        const bodyPartValue = i + 1;
+                        const bodyLocation = this.findGridItemByValue(bodyPartValue);
                         if (i === this.score) {
-                            // handle tail removal
+                            this.grid[headLocation.row][headLocation.column]++;
                             this.grid[bodyLocation.row][bodyLocation.column] = this.Constants.gridValues.empty;
                         } else {
                             // handle body movement
