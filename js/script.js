@@ -14,7 +14,7 @@ class ArtysSnakeGame {
         // constants
         this.Constants = {};
         this.Constants.default = {};
-        this.Constants.default.timeout = 1111;
+        this.Constants.default.timeout = 777;
         this.Constants.minimum = {};
         this.Constants.minimum.rows = 5;
         this.Constants.minimum.columns = 5;
@@ -60,7 +60,8 @@ class ArtysSnakeGame {
         }
         this.score = 0;
         this.direction = this.Constants.directions.up;
-        this.grid = this.buildStartingGrid();
+        this.buildStartingGrid();
+        this.placeRandomEgg();
         this.drawGrid();
         // TODO: handle popup?
         this.startGame();
@@ -77,8 +78,13 @@ class ArtysSnakeGame {
             const eggLocation = this.findGridItemByValue(this.Constants.gridValues.egg);
             console.log(eggLocation);
 
-            // handle out of bounds
-            if (newHeadLocation.row === this.rows - 1 || newHeadLocation.row === 0 || newHeadLocation.column === 0 || newHeadLocation.column === this.columns - 1) {
+            if (this.isGameWinner() === true) {
+                // handle win
+                clearInterval(this.interval);
+                console.log("YOU WIN!");
+                // TODO: show popup?
+            } else if (newHeadLocation.row === this.rows - 1 || newHeadLocation.row === 0 || newHeadLocation.column === 0 || newHeadLocation.column === this.columns - 1) {
+                // handle out of bounds
                 clearInterval(this.interval);
                 this.grid[newHeadLocation.row][newHeadLocation.column] = this.Constants.gridValues.collision;
                 if (this.score === 0) {
@@ -102,9 +108,27 @@ class ArtysSnakeGame {
 
             } else if (eggLocation && newHeadLocation.row === eggLocation.row && newHeadLocation.column === eggLocation.column) {
                 // handle got egg
-                this.score++;
-                this.grid[headLocation.row][headLocation.column]++;
-                this.grid[newHeadLocation.row][newHeadLocation.column] = this.Constants.gridValues.head;
+                if (this.score === 0) {
+                    this.score++;
+                    this.grid[headLocation.row][headLocation.column]++;
+                    this.grid[newHeadLocation.row][newHeadLocation.column] = this.Constants.gridValues.head;
+                } else {
+                    this.score++;
+                    for (let i = 1; i <= this.score; i++) {
+                        const bodyPartValue = i + 1;
+                        const bodyLocation = this.findGridItemByValue(bodyPartValue);
+                        if (i === this.score) {
+                            //this.grid[headLocation.row][headLocation.column]++;
+                            //this.grid[bodyLocation.row][bodyLocation.column] = this.Constants.gridValues.empty;
+                        } else {
+                            // handle body movement
+                            this.grid[headLocation.row][headLocation.column]++;
+                            this.grid[bodyLocation.row][bodyLocation.column]++;
+                        }
+                    }
+                    this.grid[newHeadLocation.row][newHeadLocation.column] = this.Constants.gridValues.head;
+                }
+                this.placeRandomEgg();
             } else {
                 // handle movement
                 if (this.score === 0) {
@@ -115,10 +139,15 @@ class ArtysSnakeGame {
                     for (let i = 1; i <= this.score; i++) {
                         const bodyPartValue = i + 1;
                         const bodyLocation = this.findGridItemByValue(bodyPartValue);
+                        console.log(`i: ${i}`);
+                        console.log(`score: ${this.score}`);
+                        console.log(`bodyPartValue: ${bodyPartValue}`);
                         if (i === this.score) {
+                            console.log("A");
                             this.grid[headLocation.row][headLocation.column]++;
                             this.grid[bodyLocation.row][bodyLocation.column] = this.Constants.gridValues.empty;
                         } else {
+                            console.log("B");
                             // handle body movement
                             this.grid[headLocation.row][headLocation.column]++;
                             this.grid[bodyLocation.row][bodyLocation.column]++;
@@ -226,7 +255,7 @@ class ArtysSnakeGame {
     buildStartingGrid() {
         const headLocationRow = this.rows - 3;
         const headLocationColumn = Math.floor(this.columns / 2);
-        const grid = [];
+        this.grid = [];
         for (let i = 0; i < this.rows; i++) {
             const row = [];
             for (let j = 0; j < this.columns; j++) {
@@ -238,11 +267,34 @@ class ArtysSnakeGame {
                     row.push(this.Constants.gridValues.empty);
                 }
             }
-            grid.push(row);
+            this.grid.push(row);
         }
-        // TODO: make this random???
-        grid[3][3] = this.Constants.gridValues.egg;
-        return grid;
+    }
+
+    placeRandomEgg() {
+        const emptyCells = Util.shuffle(this.getEmptyCells(this.grid));
+        this.grid[emptyCells[0].row][emptyCells[0].column] = this.Constants.gridValues.egg;
+    }
+
+    isGameWinner() {
+        return this.getEmptyCells(this.grid) === 0;
+    }
+
+    getEmptyCells(grid) {
+        const cells = [];
+        for (let i = 0; i < grid.length; i++) {
+            const row = grid[i];
+            for (let j = 0; j < row.length; j++) {
+                const item = row[j];
+                if (item === this.Constants.gridValues.empty) {
+                    cells.push({
+                        row: i,
+                        column: j
+                    });
+                }
+            }
+        }
+        return cells;
     }
 
     buildHTML() {
@@ -260,6 +312,11 @@ class ArtysSnakeGame {
         const headerDiv = document.createElement("div");
         headerDiv.classList.add(this.Constants.layout.header);
         headerDiv.style.gridArea = this.Constants.layout.header;
+        headerDiv.onclick = () => {
+            if (this.interval) {
+                clearInterval(this.interval);
+            }
+        };
         this.container.appendChild(headerDiv);
 
         // create header grid area
@@ -292,20 +349,36 @@ class ArtysSnakeGame {
         const upButton = document.createElement("button");
         upButton.id = this.Constants.directions.up;
         upButton.innerText = this.Constants.buttons.up;
-        upButton.onclick = () => { app.direction = app.Constants.directions.up; };
+        upButton.onclick = () => {
+            if (app.score === 0 || app.direction !== app.Constants.directions.down) {
+                app.direction = app.Constants.directions.up;
+            }
+        };
         const leftButton = document.createElement("button");
         leftButton.id = this.Constants.directions.left;
         leftButton.innerText = this.Constants.buttons.left;
-        leftButton.onclick = () => { app.direction = app.Constants.directions.left; };
+        leftButton.onclick = () => {
+            if (app.score === 0 || app.direction !== app.Constants.directions.right) {
+                app.direction = app.Constants.directions.left;
+            }
+        };
         const rightButton = document.createElement("button");
         rightButton.id = this.Constants.directions.right;
         rightButton.innerText = this.Constants.buttons.right;
-        rightButton.onclick = () => { app.direction = app.Constants.directions.right; };
+        rightButton.onclick = () => {
+            if (app.score === 0 || app.direction !== app.Constants.directions.left) {
+                app.direction = app.Constants.directions.right;
+            }
+        };
         const downButton = document.createElement("button");
         downButton.id = this.Constants.directions.down;
         downButton.classList.add(this.Constants.layout.flip);
         downButton.innerText = this.Constants.buttons.down;
-        downButton.onclick = () => { app.direction = app.Constants.directions.down; };
+        downButton.onclick = () => {
+            if (app.score === 0 || app.direction !== app.Constants.directions.up) {
+                app.direction = app.Constants.directions.down;
+            }
+        };
         const leftRightDiv = document.createElement("div");
         leftRightDiv.classList.add(this.Constants.layout.leftrightcontainer);
         leftRightDiv.appendChild(leftButton);
