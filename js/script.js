@@ -14,7 +14,7 @@ class ArtysSnakeGame {
         // constants
         this.Constants = {};
         this.Constants.default = {};
-        this.Constants.default.timeout = 777;
+        this.Constants.default.timeout = 500;
         this.Constants.minimum = {};
         this.Constants.minimum.rows = 5;
         this.Constants.minimum.columns = 5;
@@ -55,9 +55,7 @@ class ArtysSnakeGame {
 
     reset() {
         // TODO: destroy instead?
-        if (this.interval) {
-            clearInterval(this.interval);
-        }
+        this.clearTimer()
         this.score = 0;
         this.direction = this.Constants.directions.up;
         this.buildStartingGrid();
@@ -72,87 +70,56 @@ class ArtysSnakeGame {
             this.printGrid();
             // find head
             const headLocation = this.findGridItemByValue(this.Constants.gridValues.head);
-            console.log(headLocation);
+            //console.log(headLocation);
             const newHeadLocation = this.calculateNewPosition(headLocation.row, headLocation.column);
-            console.log(newHeadLocation);
+            //console.log(newHeadLocation);
             const eggLocation = this.findGridItemByValue(this.Constants.gridValues.egg);
-            console.log(eggLocation);
+            //console.log(eggLocation);
+            let bodyLocations = this.getBodyLocations();
+            console.log(bodyLocations);
+            for (let i = 0; i < bodyLocations.length; i++) {
+                const item = bodyLocations[i];
+                const isTail = i === bodyLocations.length - 1;
+                console.log(`isTail: ${isTail}`);
+            }
 
-            if (this.isGameWinner() === true) {
-                // handle win
-                clearInterval(this.interval);
-                console.log("YOU WIN!");
-                // TODO: show popup?
-            } else if (newHeadLocation.row === this.rows - 1 || newHeadLocation.row === 0 || newHeadLocation.column === 0 || newHeadLocation.column === this.columns - 1) {
-                // handle out of bounds
-                clearInterval(this.interval);
-                this.grid[newHeadLocation.row][newHeadLocation.column] = this.Constants.gridValues.collision;
-                if (this.score === 0) {
-                    this.grid[headLocation.row][headLocation.column]--;
-                } else {
-                    for (let i = 1; i <= this.score; i++) {
-                        const bodyPartValue = i + 1;
-                        const bodyLocation = this.findGridItemByValue(bodyPartValue);
-                        if (i === this.score) {
-                            this.grid[headLocation.row][headLocation.column]++;
-                            this.grid[bodyLocation.row][bodyLocation.column] = this.Constants.gridValues.empty;
-                        } else {
-                            // handle body movement
-                            this.grid[headLocation.row][headLocation.column]++;
-                            this.grid[bodyLocation.row][bodyLocation.column]++;
-                        }
-                    }
-                }
-                // TODO: show game over popup?
-            } else if (false) { // TODO: handle detect touch self
-
-            } else if (eggLocation && newHeadLocation.row === eggLocation.row && newHeadLocation.column === eggLocation.column) {
+            if (eggLocation && newHeadLocation.row === eggLocation.row && newHeadLocation.column === eggLocation.column) {
                 // handle got egg
-                if (this.score === 0) {
-                    this.score++;
-                    this.grid[headLocation.row][headLocation.column]++;
-                    this.grid[newHeadLocation.row][newHeadLocation.column] = this.Constants.gridValues.head;
-                } else {
-                    this.score++;
-                    for (let i = 1; i <= this.score; i++) {
-                        const bodyPartValue = i + 1;
-                        const bodyLocation = this.findGridItemByValue(bodyPartValue);
-                        if (i === this.score) {
-                            //this.grid[headLocation.row][headLocation.column]++;
-                            //this.grid[bodyLocation.row][bodyLocation.column] = this.Constants.gridValues.empty;
-                        } else {
-                            // handle body movement
-                            this.grid[headLocation.row][headLocation.column]++;
-                            this.grid[bodyLocation.row][bodyLocation.column]++;
-                        }
-                    }
-                    this.grid[newHeadLocation.row][newHeadLocation.column] = this.Constants.gridValues.head;
+                this.score++;
+                for (let i = 0; i < bodyLocations.length; i++) {
+                    const bodyLocation = bodyLocations[i];
+                    this.grid[bodyLocation.row][bodyLocation.column]++;
                 }
-                this.placeRandomEgg();
+                this.grid[newHeadLocation.row][newHeadLocation.column] = this.Constants.gridValues.head;
+                if (this.isGameWinner() === true) {
+                    // handle win
+                    this.clearTimer();
+                    console.log("YOU WIN!");
+                    // TODO: add popup?
+                } else {
+                    this.placeRandomEgg();
+                }
             } else {
                 // handle movement
-                if (this.score === 0) {
-                    this.grid[headLocation.row][headLocation.column]--;
-                    this.grid[newHeadLocation.row][newHeadLocation.column]++;
-                } else {
-                    this.grid[newHeadLocation.row][newHeadLocation.column] = this.Constants.gridValues.head;
-                    for (let i = 1; i <= this.score; i++) {
-                        const bodyPartValue = i + 1;
-                        const bodyLocation = this.findGridItemByValue(bodyPartValue);
-                        console.log(`i: ${i}`);
-                        console.log(`score: ${this.score}`);
-                        console.log(`bodyPartValue: ${bodyPartValue}`);
-                        if (i === this.score) {
-                            console.log("A");
-                            this.grid[headLocation.row][headLocation.column]++;
-                            this.grid[bodyLocation.row][bodyLocation.column] = this.Constants.gridValues.empty;
-                        } else {
-                            console.log("B");
-                            // handle body movement
-                            this.grid[headLocation.row][headLocation.column]++;
-                            this.grid[bodyLocation.row][bodyLocation.column]++;
-                        }
+                for (let i = 0; i < bodyLocations.length; i++) {
+                    const bodyLocation = bodyLocations[i];
+                    const isTail = i === bodyLocations.length - 1;
+                    if (isTail === false) {
+                        // handle body movement
+                        this.grid[bodyLocation.row][bodyLocation.column]++;
+                    } else {
+                        // handle tail
+                        this.grid[bodyLocation.row][bodyLocation.column] = this.Constants.gridValues.empty;
                     }
+                }
+                if (!Number.isInteger(this.grid[newHeadLocation.row][newHeadLocation.column]) || this.grid[newHeadLocation.row][newHeadLocation.column] > 0) {
+                    // handle hitting border or self
+                    this.clearTimer();
+                    this.grid[newHeadLocation.row][newHeadLocation.column] = this.Constants.gridValues.collision;
+                    // TODO: add popup?
+                } else {
+                    // handle setting new head
+                    this.grid[newHeadLocation.row][newHeadLocation.column] = this.Constants.gridValues.head;
                 }
             }
             this.printGrid();
@@ -160,36 +127,44 @@ class ArtysSnakeGame {
         }, this.Constants.default.timeout)
     }
 
+    getBodyLocations() {
+        const locations = [];
+        for (let i = 0; i <= this.score; i++) {
+            const bodyPartValue = i + 1;
+            const bodyLocation = this.findGridItemByValue(bodyPartValue);
+            bodyLocation.value = bodyPartValue;
+            locations.push(bodyLocation);
+        }
+        return locations;
+    }
+
     calculateNewPosition(row, column) {
+        const pos = {
+            row: row,
+            column: column
+        };
         switch (this.direction) {
             case this.Constants.directions.up:
-                return {
-                    row: row - 1,
-                    column: column
-                };
+                pos.row = row - 1;
+                pos.column = column;
                 break;
             case this.Constants.directions.down:
-                return {
-                    row: row + 1,
-                    column: column
-                };
+                pos.row = row + 1;
+                pos.column = column;
                 break;
             case this.Constants.directions.left:
-                return {
-                    row: row,
-                    column: column - 1
-                };
+                pos.row = row;
+                pos.column = column - 1;
                 break;
             case this.Constants.directions.right:
-                return {
-                    row: row,
-                    column: column + 1
-                };
+                pos.row = row;
+                pos.column = column + 1;
                 break;
             default:
                 console.log(`Invalid direction ${this.direction}`);
                 break;
         }
+        return pos;
     }
 
     findGridItemByValue(value) {
@@ -205,6 +180,7 @@ class ArtysSnakeGame {
                 }
             }
         }
+        console.log(`Invalid grid item value ${value}`);
     }
 
     drawGrid() {
@@ -269,15 +245,23 @@ class ArtysSnakeGame {
             }
             this.grid.push(row);
         }
+        // this.grid[this.rows - 2][headLocationColumn] = 2;
+        // this.score++;
+        // this.grid[this.rows - 2][headLocationColumn - 1] = 3;
+        // this.score++;
+        // this.grid[this.rows - 2][headLocationColumn - 2] = 4;
+        // this.score++;
     }
 
     placeRandomEgg() {
         const emptyCells = Util.shuffle(this.getEmptyCells(this.grid));
-        this.grid[emptyCells[0].row][emptyCells[0].column] = this.Constants.gridValues.egg;
+        if (emptyCells.length > 0) {
+            this.grid[emptyCells[0].row][emptyCells[0].column] = this.Constants.gridValues.egg;
+        }
     }
 
     isGameWinner() {
-        return this.getEmptyCells(this.grid) === 0;
+        return this.getEmptyCells(this.grid).length === 0;
     }
 
     getEmptyCells(grid) {
@@ -312,9 +296,11 @@ class ArtysSnakeGame {
         const headerDiv = document.createElement("div");
         headerDiv.classList.add(this.Constants.layout.header);
         headerDiv.style.gridArea = this.Constants.layout.header;
-        headerDiv.onclick = () => {
+        headerDiv.onclick = () => { // TODO: remove this
             if (this.interval) {
-                clearInterval(this.interval);
+                this.clearTimer();
+            } else {
+                this.startGame();
             }
         };
         this.container.appendChild(headerDiv);
@@ -396,6 +382,13 @@ class ArtysSnakeGame {
         this.container.style.gridTemplateAreas += `"${footerGridNameList.join(" ")}"`;
     }
 
+    clearTimer() {
+        if (this.interval) {
+            clearInterval(this.interval);
+            this.interval = null;
+        }
+    }
+
     printGrid() {
         let output = "";
         for (let i = 0; i < this.grid.length; i++) {
@@ -411,9 +404,7 @@ class ArtysSnakeGame {
 
     destroy() {
         // TODO: destroy stuff
-        if (this.interval) {
-            clearInterval(this.interval);
-        }
+        this.clearTimer();
     }
 }
 
