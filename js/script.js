@@ -58,6 +58,7 @@ class ArtysSnakeGame {
         this.clearTimer()
         this.score = 0;
         this.direction = this.Constants.directions.up;
+        this.nextDirection = this.direction; // to stop ui bug when changing direction in an invalid way caused by the timer delay
         this.buildStartingGrid();
         this.placeRandomEgg();
         this.drawGrid();
@@ -67,7 +68,16 @@ class ArtysSnakeGame {
 
     startGame() {
         this.interval = setInterval(() => {
-            this.printGrid();
+            // handle direction change, stops weird timer bug
+            if (
+                (this.direction === this.Constants.directions.up && this.nextDirection !== this.Constants.directions.down) ||
+                (this.direction === this.Constants.directions.down && this.nextDirection !== this.Constants.directions.up) ||
+                (this.direction === this.Constants.directions.left && this.nextDirection !== this.Constants.directions.right) ||
+                (this.direction === this.Constants.directions.right && this.nextDirection !== this.Constants.directions.left)
+            ) {
+                this.direction = this.nextDirection;
+            }
+            //this.printGrid();
             // find head
             const headLocation = this.findGridItemByValue(this.Constants.gridValues.head);
             //console.log(headLocation);
@@ -80,7 +90,7 @@ class ArtysSnakeGame {
             for (let i = 0; i < bodyLocations.length; i++) {
                 const item = bodyLocations[i];
                 const isTail = i === bodyLocations.length - 1;
-                console.log(`isTail: ${isTail}`);
+                //console.log(`isTail: ${isTail}`);
             }
 
             if (eggLocation && newHeadLocation.row === eggLocation.row && newHeadLocation.column === eggLocation.column) {
@@ -122,7 +132,7 @@ class ArtysSnakeGame {
                     this.grid[newHeadLocation.row][newHeadLocation.column] = this.Constants.gridValues.head;
                 }
             }
-            this.printGrid();
+            //this.printGrid();
             this.drawGrid();
         }, this.Constants.default.timeout)
     }
@@ -335,36 +345,20 @@ class ArtysSnakeGame {
         const upButton = document.createElement("button");
         upButton.id = this.Constants.directions.up;
         upButton.innerText = this.Constants.buttons.up;
-        upButton.onclick = () => {
-            if (app.score === 0 || app.direction !== app.Constants.directions.down) {
-                app.direction = app.Constants.directions.up;
-            }
-        };
+        upButton.onclick = () => { app.nextDirection = app.Constants.directions.up; };
         const leftButton = document.createElement("button");
         leftButton.id = this.Constants.directions.left;
         leftButton.innerText = this.Constants.buttons.left;
-        leftButton.onclick = () => {
-            if (app.score === 0 || app.direction !== app.Constants.directions.right) {
-                app.direction = app.Constants.directions.left;
-            }
-        };
+        leftButton.onclick = () => { app.nextDirection = app.Constants.directions.left; };
         const rightButton = document.createElement("button");
         rightButton.id = this.Constants.directions.right;
         rightButton.innerText = this.Constants.buttons.right;
-        rightButton.onclick = () => {
-            if (app.score === 0 || app.direction !== app.Constants.directions.left) {
-                app.direction = app.Constants.directions.right;
-            }
-        };
+        rightButton.onclick = () => { app.nextDirection = app.Constants.directions.right; };
         const downButton = document.createElement("button");
         downButton.id = this.Constants.directions.down;
         downButton.classList.add(this.Constants.layout.flip);
         downButton.innerText = this.Constants.buttons.down;
-        downButton.onclick = () => {
-            if (app.score === 0 || app.direction !== app.Constants.directions.up) {
-                app.direction = app.Constants.directions.down;
-            }
-        };
+        downButton.onclick = () => { app.nextDirection = app.Constants.directions.down; };
         const leftRightDiv = document.createElement("div");
         leftRightDiv.classList.add(this.Constants.layout.leftrightcontainer);
         leftRightDiv.appendChild(leftButton);
