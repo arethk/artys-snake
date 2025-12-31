@@ -359,6 +359,25 @@ class ArtysSnakeGame {
             footerGridNameList.push(this.Constants.layout.footer);
         }
         this.container.style.gridTemplateAreas += `"${footerGridNameList.join(" ")}"`;
+
+        window.onkeydown = (event) => {
+            switch (event.code) {
+                case "ArrowUp":
+                    app.nextDirection = app.Constants.directions.up;
+                    break;
+                case "ArrowDown":
+                    app.nextDirection = app.Constants.directions.down;
+                    break;
+                case "ArrowLeft":
+                    app.nextDirection = app.Constants.directions.left;
+                    break;
+                case "ArrowRight":
+                    app.nextDirection = app.Constants.directions.right;
+                    break;
+                default:
+                    break;
+            }
+        }
     }
 
     clearTimer() {
