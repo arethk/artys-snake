@@ -10,6 +10,7 @@ body {
     display: grid;
     height: 100vh;
     width: 100vw;
+    background-color: #138510;
 }
 
 .header {
@@ -19,6 +20,8 @@ body {
     justify-content: center;
     align-items: center;
     align-content: center;
+    background-color: black;
+    color: grey;
 }
 
 .header::after {
@@ -36,6 +39,7 @@ button {
     height: 100%;
     font-size: 2.0vw;
     font-weight: bold;
+    color: black;
 }
 
 .flip {

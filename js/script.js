@@ -39,7 +39,14 @@ class ArtysSnakeGame {
         this.Constants.gridCssClass = {};
         this.Constants.gridCssClass.border = "border";
         this.Constants.gridCssClass.empty = "";
-        this.Constants.gridCssClass.head = "head";
+        this.Constants.gridCssClass.headUp = "head-up";
+        this.Constants.gridCssClass.headDown = "head-down";
+        this.Constants.gridCssClass.headLeft = "head-left";
+        this.Constants.gridCssClass.headRight = "head-right";
+        this.Constants.gridCssClass.tailUp = "tail-up";
+        this.Constants.gridCssClass.tailDown = "tail-down";
+        this.Constants.gridCssClass.tailLeft = "tail-left";
+        this.Constants.gridCssClass.tailRight = "tail-right";
         this.Constants.gridCssClass.body = "body";
         this.Constants.gridCssClass.egg = "egg";
         this.Constants.gridCssClass.collision = "collision";
@@ -180,7 +187,7 @@ class ArtysSnakeGame {
             const row = this.grid[i];
             for (let j = 0; j < row.length; j++) {
                 const item = row[j];
-                if (item === value) {
+                if (item === value || (value === 1 && item === this.Constants.gridValues.collision)) {
                     return {
                         row: i,
                         column: j
@@ -195,7 +202,14 @@ class ArtysSnakeGame {
         const gridCssClasses = [
             this.Constants.gridCssClass.border,
             //this.Constants.gridCssClass.empty,
-            this.Constants.gridCssClass.head,
+            this.Constants.gridCssClass.headUp,
+            this.Constants.gridCssClass.headDown,
+            this.Constants.gridCssClass.headLeft,
+            this.Constants.gridCssClass.headRight,
+            this.Constants.gridCssClass.tailUp,
+            this.Constants.gridCssClass.tailDown,
+            this.Constants.gridCssClass.tailLeft,
+            this.Constants.gridCssClass.tailRight,
             this.Constants.gridCssClass.body,
             this.Constants.gridCssClass.egg,
             this.Constants.gridCssClass.collision
@@ -216,7 +230,23 @@ class ArtysSnakeGame {
                         //cell.classList.add(this.Constants.gridCssClass.empty);
                         break;
                     case this.Constants.gridValues.head:
-                        cell.classList.add(this.Constants.gridCssClass.head);
+                        switch (this.direction) {
+                            case this.Constants.directions.up:
+                                cell.classList.add(this.Constants.gridCssClass.headUp);
+                                break;
+                            case this.Constants.directions.down:
+                                cell.classList.add(this.Constants.gridCssClass.headDown);
+                                break;
+                            case this.Constants.directions.left:
+                                cell.classList.add(this.Constants.gridCssClass.headLeft);
+                                break;
+                            case this.Constants.directions.right:
+                                cell.classList.add(this.Constants.gridCssClass.headRight);
+                                break;
+                            default:
+                                console.log(`Invalid direction ${this.direction}`);
+                                break;
+                        }
                         break;
                     case this.Constants.gridValues.egg:
                         cell.classList.add(this.Constants.gridCssClass.egg);
@@ -226,7 +256,27 @@ class ArtysSnakeGame {
                         break;
                     default:
                         if (Number.isInteger(item)) {
-                            cell.classList.add(this.Constants.gridCssClass.body);
+                            const bodyLocations = this.getBodyLocations();
+                            const beforeItem = bodyLocations[bodyLocations.length - 2];
+                            const tail = bodyLocations[bodyLocations.length - 1];
+                            if (item === tail.value) {
+                                // handle tail
+                                if (beforeItem.column === tail.column) {
+                                    if (beforeItem.row < tail.row) {
+                                        cell.classList.add(this.Constants.gridCssClass.tailDown);
+                                    } else {
+                                        cell.classList.add(this.Constants.gridCssClass.tailUp);
+                                    }
+                                } else {
+                                    if (beforeItem.column < tail.column) {
+                                        cell.classList.add(this.Constants.gridCssClass.tailRight);
+                                    } else {
+                                        cell.classList.add(this.Constants.gridCssClass.tailLeft);
+                                    }
+                                }
+                            } else {
+                                cell.classList.add(this.Constants.gridCssClass.body);
+                            }
                         } else {
                             console.log(`Invalid grid value ${item}`);
                         }
