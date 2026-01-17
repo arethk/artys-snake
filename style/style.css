@@ -31,6 +31,7 @@ body {
 .footer {
     display: flex;
     flex-direction: column;
+    background-color: black;
 }
 
 button {
