@@ -61,6 +61,31 @@ class ArtysSnakeGame {
         this.Constants.buttons.left = "<";
         this.Constants.buttons.right = ">";
 
+        // setup sounds
+        this.moveSounds = new OrderedSoundPlayer([
+            document.querySelector("#soundMove1"),
+            document.querySelector("#soundMove2"),
+            document.querySelector("#soundMove1"),
+            document.querySelector("#soundMove2"),
+            document.querySelector("#soundMove3"),
+            document.querySelector("#soundMove4"),
+            document.querySelector("#soundMove3"),
+            document.querySelector("#soundMove4"),
+            document.querySelector("#soundMove5"),
+            document.querySelector("#soundMove6"),
+            document.querySelector("#soundMove5"),
+            document.querySelector("#soundMove6")
+        ]);
+        this.eggSounds = new OrderedSoundPlayer([
+            document.querySelector("#soundEat")
+        ]);
+        this.gameOverSounds = new OrderedSoundPlayer([
+            document.querySelector("#soundGameOver")
+        ]);
+        this.winSounds = new OrderedSoundPlayer([
+            document.querySelector("#soundWin")
+        ]);
+
         // action
         this.interval = null;
         this.buildHTML();
@@ -110,8 +135,10 @@ class ArtysSnakeGame {
                     setTimeout(() => {
                         this.showPopup(this.popupWin, this.score);
                     }, this.Constants.default.popupTimeout);
+                    this.winSounds.play();
                 } else {
                     this.placeRandomEgg();
+                    this.eggSounds.play();
                 }
             } else {
                 // handle movement
@@ -133,9 +160,11 @@ class ArtysSnakeGame {
                     setTimeout(() => {
                         this.showPopup(this.popupGameover, this.score);
                     }, this.Constants.default.popupTimeout);
+                    this.gameOverSounds.play();
                 } else {
                     // handle setting new head
                     this.grid[newHeadLocation.row][newHeadLocation.column] = this.Constants.gridValues.head;
+                    this.moveSounds.play();
                 }
             }
             this.drawGrid();
