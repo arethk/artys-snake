@@ -21,7 +21,7 @@ class OrderedSoundPlayer {
             });
             this.index++;
         } else {
-            this.index = 0;
+            this.reset();
             this.play();
         }
     }
