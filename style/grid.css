@@ -86,7 +86,10 @@
 }
 
 .collision {
-    background-color: red;
+    background-image: url(../assets/skull.png);
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center center;
 }
 
 .body {

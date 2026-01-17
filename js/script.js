@@ -164,7 +164,7 @@ class ArtysSnakeGame {
                 } else {
                     // handle setting new head
                     this.grid[newHeadLocation.row][newHeadLocation.column] = this.Constants.gridValues.head;
-                    this.moveSounds.play();
+                    //this.moveSounds.play();
                 }
             }
             this.drawGrid();
@@ -216,7 +216,7 @@ class ArtysSnakeGame {
             const row = this.grid[i];
             for (let j = 0; j < row.length; j++) {
                 const item = row[j];
-                if (item === value || (value === 1 && item === this.Constants.gridValues.collision)) {
+                if (item === value || item === this.Constants.gridValues.collision) {
                     return {
                         row: i,
                         column: j
@@ -229,7 +229,7 @@ class ArtysSnakeGame {
 
     drawGrid() {
         const gridCssClasses = [
-            this.Constants.gridCssClass.border,
+            //this.Constants.gridCssClass.border,
             //this.Constants.gridCssClass.empty,
             this.Constants.gridCssClass.headUp,
             this.Constants.gridCssClass.headDown,

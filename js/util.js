@@ -1,13 +1,4 @@
 class Util {
-    /*
-    static getKeyByValue(object, value) {
-        return Object.keys(object).find(key => object[key] === value);
-    }
-
-    function randomInt(min: number, max: number) {
-        return Math.floor(Math.random() * (max - min + 1) + min);
-    }
-    */
     static shuffle(array) {
         if (Array.isArray(array) === false) {
             throw "Argument must be an array";
