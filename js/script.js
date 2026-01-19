@@ -62,20 +62,6 @@ class ArtysSnakeGame {
         this.Constants.buttons.right = ">";
 
         // setup sounds
-        this.moveSounds = new OrderedSoundPlayer([
-            document.querySelector("#soundMove1"),
-            document.querySelector("#soundMove2"),
-            document.querySelector("#soundMove1"),
-            document.querySelector("#soundMove2"),
-            document.querySelector("#soundMove3"),
-            document.querySelector("#soundMove4"),
-            document.querySelector("#soundMove3"),
-            document.querySelector("#soundMove4"),
-            document.querySelector("#soundMove5"),
-            document.querySelector("#soundMove6"),
-            document.querySelector("#soundMove5"),
-            document.querySelector("#soundMove6")
-        ]);
         this.eggSounds = new OrderedSoundPlayer([
             document.querySelector("#soundEat")
         ]);
@@ -164,7 +150,6 @@ class ArtysSnakeGame {
                 } else {
                     // handle setting new head
                     this.grid[newHeadLocation.row][newHeadLocation.column] = this.Constants.gridValues.head;
-                    //this.moveSounds.play();
                 }
             }
             this.drawGrid();

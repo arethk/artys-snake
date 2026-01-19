@@ -1,11 +1,12 @@
 class OrderedSoundPlayer {
     constructor(soundList) {
-        if (Array.isArray(soundList) === false) {
-            throw new Error("Invalid soundList, must be an array of HTML Sound Elements");
+        const errorMsg = "Invalid soundList, must be an array of at least one HTML Sound Element";
+        if (Array.isArray(soundList) === false || soundList.length === 0) {
+            throw new Error(errorMsg);
         }
         soundList.forEach(element => {
             if (element instanceof HTMLAudioElement === false) {
-                throw new Error("Invalid soundList, must be an array of HTML Sound Elements");
+                throw new Error(errorMsg);
             }
         });
         this.sounds = soundList;
