@@ -202,19 +202,22 @@ class ArtysSnakeGame {
             const row = this.grid[i];
             for (let j = 0; j < row.length; j++) {
                 const item = row[j];
-                if (item === value) {
-                    return {
-                        row: i,
-                        column: j
-                    };
-                } else if (item === this.Constants.gridValues.collision) {
-                    collision = {
-                        row: i,
-                        column: j
-                    };
+                switch (item) {
+                    case value:
+                        return {
+                            row: i,
+                            column: j
+                        };
+                    case this.Constants.gridValues.collision:
+                        collision = {
+                            row: i,
+                            column: j
+                        };
+                        break;
                 }
             }
         }
+        // if item not found, it has to be the collision
         if (collision !== null) {
             return collision;
         }
