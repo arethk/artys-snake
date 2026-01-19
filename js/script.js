@@ -197,17 +197,26 @@ class ArtysSnakeGame {
     }
 
     findGridItemByValue(value) {
+        let collision = null;
         for (let i = 0; i < this.grid.length; i++) {
             const row = this.grid[i];
             for (let j = 0; j < row.length; j++) {
                 const item = row[j];
-                if (item === value || item === this.Constants.gridValues.collision) {
+                if (item === value) {
                     return {
+                        row: i,
+                        column: j
+                    };
+                } else if (item === this.Constants.gridValues.collision) {
+                    collision = {
                         row: i,
                         column: j
                     };
                 }
             }
+        }
+        if (collision !== null) {
+            return collision;
         }
         console.log(`Invalid grid item value ${value}`);
     }
