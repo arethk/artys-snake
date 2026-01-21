@@ -504,10 +504,10 @@ class ArtysSnakeGame {
 
 let app = null;
 window.onload = function () {
-    const container = "container";
+    const container = document.querySelector(".container");
     const gameRows = 12;
     const gameColumns = 12;
-    app = new ArtysSnakeGame(document.querySelector(`.${container}`), gameRows, gameColumns);
+    app = new ArtysSnakeGame(container, gameRows, gameColumns);
 }
 
 window.onbeforeunload = function () {
